@@ -78,8 +78,7 @@ for loc in locations:
     rectangles.append(rect)
     rectangles.append(rect)
 
-rectangles, weights = cv.groupRectangles(rectangles, 1, 0.05)
-print("debug")
+rectangles, weights = cv.groupRectangles(rectangles, 1, 0.1)
 if len(rectangles):
     line_color = (0, 255, 0)
     line_type = cv.LINE_4
@@ -92,13 +91,11 @@ if len(rectangles):
         bottom_right = (x + w, y + h)
         # Draw the box
         cv.rectangle(img, top_left, bottom_right, line_color, line_thickness, line_type)
+
 # endregion
-
-
 cv.imshow("Debug", img)
 cv.waitKey(0)
 exit()
-
 # Main Loop
 while True:
     screenshot = wincap.get_screenshot()
