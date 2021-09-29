@@ -24,7 +24,9 @@ class WindowCapture:
         else:
             #TODO: nedokáže nájsť Albion okno, problém je vysvetlený tu:
             # https://stackoverflow.com/questions/59014894/screenshots-taken-with-pywin32-some-times-get-a-black-imgaes-i-think-that-handl
-            self.hwnd = win32gui.FindWindow(None,window_name)
+            # taktiež sa vyskytne problém keď sa názov okna dynamický mení (napríklad cookie clicker má množstvo cookies v názve okna v reálnom čase
+            # alebo spotify má v názve aktuálnu pesničku)
+            self.hwnd = win32gui.FindWindow(None, window_name)
             if not self.hwnd:
                 raise Exception("Window not found: {}".format(window_name))
 

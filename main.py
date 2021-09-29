@@ -1,15 +1,11 @@
+import numpy as np
 import cv2 as cv
 from windows_capture import WindowCapture
-import numpy as np
+from vision import Vision
+
 
 wincap = WindowCapture()
-img = cv.imread('Images/Albion_Debug.png')
-template = cv.imread("Images/Albion_Debug_Template.png")
-match_threshold = 0.2
-
-match_w = template.shape[1]
-match_h = template.shape[0]
-
+vision_cookie = Vision("Images/Cookie Clicker/cookie.png",method = cv.TM_CCOEFF_NORMED)
 
 # region Functions
 # get grayscale image
@@ -51,55 +47,16 @@ def opening(image):
 def canny(image):
     return cv.Canny(image,100,200)
 
-
-# template matching
-def match_template(image,template):
-    return cv.matchTemplate(image,template,cv.TM_SQDIFF_NORMED)
 # endregion
 
-# region Processed images
 
-
-gray = get_grayscale(img)
-thresh = thresholding(gray)
-opening = opening(gray)
-canny = canny(gray)
-# endregion
-
-# region Template matching
-result = match_template(img,template)
-locations = np.where(result <= match_threshold)
-locations = list(zip(*locations[::-1]))
-
-# first we need to create the list of [x, y, w, h] rectangles
-rectangles = []
-for loc in locations:
-    rect = [int(loc[0]), int(loc[1]), match_w, match_h]
-    rectangles.append(rect)
-    rectangles.append(rect)
-
-rectangles, weights = cv.groupRectangles(rectangles, 1, 0.1)
-if len(rectangles):
-    line_color = (0, 255, 0)
-    line_type = cv.LINE_4
-    line_thickness = 2
-
-    # need to loop over all the locations and draw their rectangle
-    for (x, y, w, h) in rectangles:
-        # Determine the box positions
-        top_left = (x, y)
-        bottom_right = (x + w, y + h)
-        # Draw the box
-        cv.rectangle(img, top_left, bottom_right, line_color, line_thickness, line_type)
-
-# endregion
-cv.imshow("Debug", img)
-cv.waitKey(0)
-exit()
 # Main Loop
 while True:
+    # Get an updated image of the game
     screenshot = wincap.get_screenshot()
-    cv.imshow("Computer Vision", screenshot)
+
+    # Find the object position
+    points = vision_cookie.find(screenshot, threshold = 0.6, debug_mode = "rectangles")
 
     # press q with the output window focused to exit
     # waits 1 ms every loop to process key presses
